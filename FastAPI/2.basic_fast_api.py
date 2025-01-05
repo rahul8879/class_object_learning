@@ -34,7 +34,6 @@ class ItemResponse(BaseModel):
     name: str
     message: str
 
-
 # In-memory storage for items
 items_db = {}
 
@@ -63,8 +62,6 @@ def read_item(item_id: int = Path(..., gt=0, description="The ID of the item to 
     return items_db[item_id]
 
 # Route to update an item using PUT
-
-
 @app.put("/items/{item_id}", response_model=ItemResponse)
 def update_item(item_id: int, item: Item):
     """
@@ -76,8 +73,6 @@ def update_item(item_id: int, item: Item):
     return {"id": item_id, "name": item.name, "message": "Item successfully updated!"}
 
 # Route to delete an item using DELETE
-
-
 @app.delete("/items/{item_id}", response_model=dict)
 def delete_item(item_id: int):
     """

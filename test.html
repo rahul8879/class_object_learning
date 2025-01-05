@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>JWT API Tester</h2>
+
+        <h3>Login</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="button" onclick="loginJWT()">Login</button>
+
+        <h3>Endpoints</h3>
+        <button class="button" onclick="getSecureData()">Secure Data</button>
+        <button class="button" onclick="accessProtectedRoute()">Protected Route</button>
+        <button class="button" onclick="accessAdminRoute()">Admin Route</button>
+        <button class="button" onclick="accessResourceRoute()">Resource Route</button>
+        <button class="button" onclick="logout()">Logout</button>
+
+        <h3>Response</h3>
+        <textarea id="response" readonly></textarea>
+    </div>
+
+    <script>
+        let token = null;
+
+        async function loginJWT() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('http://127.0.0.1:8000/login-jwt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                token = data.access_token;
+                alert('Login successful! Token stored.');
+            } else {
+                alert('Login failed: ' + data.detail);
+            }
+
+            document.getElementById('response').value = JSON.stringify(data, null, 2);
+        }
+
+        async function getSecureData() {
+            if (!token) return alert('Please log in first.');
+
+            const response = await fetch('http://127.0.0.1:8000/secure-data', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            document.getElementById('response').value = JSON.stringify(data, null, 2);
+        }
+
+        async function accessProtectedRoute() {
+            if (!token) return alert('Please log in first.');
+
+            const response = await fetch('http://127.0.0.1:8000/protected-route', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            document.getElementById('response').value = JSON.stringify(data, null, 2);
+        }
+
+        async function accessAdminRoute() {
+            if (!token) return alert('Please log in first.');
+
+            const response = await fetch('http://127.0.0.1:8000/admin', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            document.getElementById('response').value = JSON.stringify(data, null, 2);
+        }
+
+        async function accessResourceRoute() {
+            if (!token) return alert('Please log in first.');
+
+            const response = await fetch('http://127.0.0.1:8000/resource', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            document.getElementById('response').value = JSON.stringify(data, null, 2);
+        }
+
+        function logout() {
+            token = null;
+            alert('Logged out successfully.');
+        }
+    </script>
+</body>
+
+</html>
